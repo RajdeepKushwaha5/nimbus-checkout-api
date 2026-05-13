@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "smoke": "node scripts/smoke.mjs",
-    "trigger:error": "node scripts/trigger-production-error.mjs"
+    "trigger:error": "node scripts/trigger-production-error.mjs",
+    "trigger:live-error": "node scripts/live-sentry-error.mjs"
   },
   "dependencies": {
     "@sentry/node": "^8.55.0",

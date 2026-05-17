@@ -7,7 +7,9 @@
     "start": "node src/server.js",
     "smoke": "node scripts/smoke.mjs",
     "trigger:error": "node scripts/trigger-production-error.mjs",
-    "trigger:live-error": "node scripts/live-sentry-error.mjs"
+    "trigger:live-error": "node scripts/live-sentry-error.mjs",
+    "demo:regress": "node scripts/write-checkout-state.mjs regression",
+    "demo:fix": "node scripts/write-checkout-state.mjs fixed"
   },
   "dependencies": {
     "@sentry/node": "^8.55.0",

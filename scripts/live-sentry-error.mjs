@@ -1,21 +1,22 @@
 import * as Sentry from '@sentry/node'
-import { liveDemoRunId } from '../src/demo-release.js'
+import { demoContext } from '../src/demo-release.js'
 
-const runId = process.env.DEMO_RUN_ID || liveDemoRunId || new Date().toISOString()
-const release = process.env.RELEASE_SHA || 'local'
+const context = demoContext({ workflow: 'live-pr-to-sentry-join' })
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN || undefined,
-  release,
+  release: context.release,
   tracesSampleRate: 0,
 })
 
-const error = new Error(`Live checkout regression ${runId}`)
+const error = new Error(`Live checkout regression ${context.demoRunId}`)
 
 Sentry.withScope(scope => {
-  scope.setTag('demo_run_id', runId)
-  scope.setTag('service', 'nimbus-checkout-api')
-  scope.setFingerprint(['live-checkout-regression', runId])
+  scope.setTag('demo_run_id', context.demoRunId)
+  scope.setTag('service', context.service)
+  scope.setTag('component', context.component)
+  scope.setTag('workflow', context.workflow)
+  scope.setFingerprint(['live-checkout-regression', context.demoRunId])
   Sentry.captureException(error)
 })
 

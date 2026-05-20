@@ -1,4 +1,4 @@
-export class CheckoutValidationError extends Error {
+﻿export class CheckoutValidationError extends Error {
   constructor(message, details = {}) {
     super(message)
     this.name = 'CheckoutValidationError'

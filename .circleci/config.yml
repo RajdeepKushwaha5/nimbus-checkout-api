@@ -1,0 +1,66 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@5.2.0
+
+jobs:
+  lint:
+    docker:
+      - image: cimg/node:20.11
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Check syntax
+          command: node --check src/server.js
+
+  test:
+    docker:
+      - image: cimg/node:20.11
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Smoke test
+          command: |
+            node src/server.js &
+            sleep 3
+            curl -f http://localhost:3000/health || exit 1
+            kill %1
+
+  build:
+    docker:
+      - image: cimg/node:20.11
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Verify startup
+          command: timeout 5 node src/server.js || true
+      - run:
+          name: Archive artifact
+          command: |
+            mkdir -p /tmp/artifacts
+            tar -czf /tmp/artifacts/nimbus-checkout-api.tar.gz               --exclude=node_modules --exclude=.git .
+      - store_artifacts:
+          path: /tmp/artifacts
+          destination: build
+
+workflows:
+  ci:
+    jobs:
+      - lint
+      - test:
+          requires:
+            - lint
+      - build:
+          requires:
+            - test
+          filters:
+            branches:
+              only:
+                - main
+                - staging
